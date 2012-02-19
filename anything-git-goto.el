@@ -47,6 +47,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'anything)
+(require 'vc-git)
 
 ;;; --------------------------------------------------------------------
 ;;; - Customization
@@ -69,25 +70,24 @@
         dir
       (anything-git-goto-find-git-repo (expand-file-name "../" dir)))))
 
-(defun anything-git-goto-file (file-content)
+(defun anything-git-goto-file  (file-content)
   "Visit the source for the file result."
-  (setq file-full-path (expand-file-name
-                        file-content
-                        (expand-file-name
-                         (anything-git-goto-find-git-repo file-content)
-                         (anything-attr 'pwd))))
-  (if (file-exists-p file-full-path)
-      (find-file file-full-path))
+  (setq full-file-path
+           (expand-file-name file-content
+                             (expand-file-name
+                              (anything-git-goto-find-git-repo file-content)
+                              (anything-attr 'pwd))))
+  (if (file-exists-p full-file-path)
+      (find-file full-file-path))
   (kill-buffer *anything-git-goto-buffer-name*))
 
 (defvar anything-c-source-git-goto
   '((name . "Git goto")
-    (init
-     . (lambda ()
-         (call-process-shell-command
-          (format git-goto-cmd
-                  (anything-git-goto-find-git-repo (shell-command-to-string "pwd")))
-          nil (anything-candidate-buffer 'global))))
+    (init . (lambda ()
+              (call-process-shell-command
+               (format git-goto-cmd
+                       (anything-git-goto-find-git-repo  default-directory))
+               nil (anything-candidate-buffer 'global))))
     (candidate-number-limit . 9999)
     (candidates-in-buffer)
     (action . anything-git-goto-file))
