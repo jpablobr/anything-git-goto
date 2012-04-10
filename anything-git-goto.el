@@ -66,7 +66,7 @@
 (defun anything-git-goto-find-git-repo (dir)
   "Recursively search for a .git/ directory."
   (if (string= "/" dir)
-      (message "not in a git repo.")
+      nil ;; not in a git repo
     (if (file-exists-p (expand-file-name ".git/" dir))
         dir
       (anything-git-goto-find-git-repo (expand-file-name "../" dir)))))
@@ -85,10 +85,13 @@
 (defvar anything-c-source-git-goto
   '((name . "Git goto")
     (init . (lambda ()
-              (call-process-shell-command
-               (format git-goto-cmd
-                       (anything-git-goto-find-git-repo  default-directory))
-               nil (anything-candidate-buffer 'global))))
+              (let ((git-root
+                     (anything-git-goto-find-git-repo  default-directory)))
+                (and git-root
+                    (call-process-shell-command
+                     (format git-goto-cmd
+                             (anything-git-goto-find-git-repo  default-directory))
+                     nil (anything-candidate-buffer 'global))))))
     (candidate-number-limit . 9999)
     (candidates-in-buffer)
     (action . anything-git-goto-file))
@@ -98,8 +101,10 @@
 (defun anything-git-goto ()
   "Git Find files."
   (interactive)
-  (anything-other-buffer
-   '(anything-c-source-git-goto) *anything-git-goto-buffer-name*))
+  (if (anything-git-goto-find-git-repo  default-directory)
+      (anything-other-buffer
+       '(anything-c-source-git-goto) *anything-git-goto-buffer-name*)
+    (message "Not in a git repo")))
 
 (provide 'anything-git-goto)
 
