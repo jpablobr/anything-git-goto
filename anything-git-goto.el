@@ -2,6 +2,7 @@
 
 ;; This file is not part of Emacs
 
+;; Author: Jose Pablo Barrantes
 ;; Copyright (C) 2011 Jose Pablo Barrantes
 ;; Created: 18/Dec/11
 ;; Version: 0.1.0
@@ -101,3 +102,6 @@
    '(anything-c-source-git-goto) *anything-git-goto-buffer-name*))
 
 (provide 'anything-git-goto)
+
+
+;;; anything-git-goto.el ends here
